@@ -309,6 +309,7 @@ https://github.com/amatsuda/kaminari/wiki/Kaminari-recipes
 
 Feel free to message me on Github (amatsuda) or Twitter (@a_matsuda)  ☇☇☇  :)
 
+
 == Contributing to Kaminari
 
 Fork, fix, then send a pull request.
