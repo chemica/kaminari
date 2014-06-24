@@ -309,14 +309,6 @@ https://github.com/amatsuda/kaminari/wiki/Kaminari-recipes
 
 Feel free to message me on Github (amatsuda) or Twitter (@a_matsuda)  ☇☇☇  :)
 
-== This Fork
-
-The chemica/kaminari fork addresses an apparent problem with ActiveRecord, where queries with group_by clauses relying on column aliases
-fail on [relation].count. The standard count query replaces the select clause with columns pulled fromm the group, meaning the aliases are
-never defined and the query fails.
-
-This fork will use a sub query for count in this situation. 
-
 == Contributing to Kaminari
 
 Fork, fix, then send a pull request.
