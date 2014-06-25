@@ -25,17 +25,26 @@ module Kaminari
         args << options if ActiveRecord::VERSION::STRING < '4.1.0'
 
         # If group_by is used alongside column aliases, 'count' will destroy the select part of the
-        # query to construct the count. This means aliases will be used without being defined.
-        # In this case we want to construct a query with a count running on the relation
-        # as a sub-query
-        count_sql = c.to_sql.downcase
-        group_with_alias = count_sql.include?(" group by ") && count_sql.include?(" as ")
-        if group_with_alias
-          c = self.connection.execute("select count(*) as full_count from (#{c.to_sql}) as rel").first
-          if c.is_a?(Hash) || c.is_a?(ActiveSupport::OrderedHash)
-            c['full_count']
+        # query to construct the count. This will cause an exception
+        # Some group_by counts return hashes, which cannot be used to calculate the number of
+        # groups.
+        # In both these cases, using a sub-query to count groups resolves the issue.
+        is_group = c.to_sql.downcase.include?(" group by ")
+        if is_group
+          if ActiveRecord::VERSION::STRING >= '3.1'
+            sm = Arel::SelectManager.new c.engine
+            select_value = "count(*) as count"
+            counting_subquery = sm.project(select_value).from(c.arel.as("subquery_for_count"))
+            connection.select_one(counting_subquery)['count']
           else
-            c.first.to_i
+            # With ActiveRecord 3 fall back to string interpolation
+            c = self.connection.execute("select count(*) as subquery_count " +
+                                        "from (#{c.to_sql}) as subquery_for_count").first
+            if c.is_a?(Hash) || c.is_a?(ActiveSupport::OrderedHash)
+              c['subquery_count']
+            else
+              c.first.to_i
+            end
           end
         else
           # .group returns an OrderdHash that responds to #count
