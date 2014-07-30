@@ -61,15 +61,6 @@ module Kaminari
          self.class.name.demodulize.underscore
         ].compact.join("/")
       end
-
-      def partial_path
-        [
-         @views_prefix,
-         "kaminari",
-         @theme,
-         self.class.name.demodulize.underscore
-        ].compact.join("/")
-      end
     end
 
     # Tag that contains a link
