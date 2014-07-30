@@ -30,11 +30,12 @@ module Kaminari
         args << options if ActiveRecord::VERSION::STRING < '4.1.0'
 
         # If group_by is used alongside column aliases, 'count' will destroy the select part of the
-        # query to construct the count. This will cause an exception
+        # query to construct the count. This will cause an exception.
         # Some group_by counts return hashes, which cannot be used to calculate the number of
         # groups.
         # In both these cases, using a sub-query to count groups resolves the issue.
-        is_group = c.to_sql.downcase.include?(" group by ")
+        sql = c.to_sql.downcase
+        is_group = sql =~ /\s(group\sby|having)\s/
         if is_group
           if ActiveRecord::VERSION::STRING >= '3.1'
             sm = Arel::SelectManager.new c.engine
