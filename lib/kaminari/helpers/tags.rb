@@ -21,6 +21,7 @@ module Kaminari
         @theme = @options.delete(:theme)
         @views_prefix = @options.delete(:views_prefix)
         @params = template.params.except(*PARAM_KEY_BLACKLIST).merge(@options.delete(:params) || {})
+
       end
 
       def to_s(locals = {}) #:nodoc:
@@ -50,6 +51,15 @@ module Kaminari
         end
 
         page_params
+      end
+
+      def partial_path
+        [
+         @views_prefix,
+         "kaminari",
+         @theme,
+         self.class.name.demodulize.underscore
+        ].compact.join("/")
       end
 
       def partial_path
